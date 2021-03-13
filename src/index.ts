@@ -9,7 +9,8 @@ const http_server = new http.Server(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); //Para interpretar los objectos recibidos y que no sean solo cadenas
 
-const PORT: number = 8080;
+// const PORT = process.env.PORT ;
+const PORT = 8080 ;
 
 const server = http_server
   .listen(PORT, () => {
