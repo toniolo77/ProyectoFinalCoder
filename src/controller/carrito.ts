@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CarritoModel } from "../model/carrito";
 
-const carrito = new CarritoModel();
+const carrito = new CarritoModel(); 
 
 export const getProductosCarrito = async (req: Request, res: Response) => {
   try {
