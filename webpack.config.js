@@ -16,6 +16,9 @@ module.exports = {
     resolve: {
         extensions: ['.ts','.js'],
     },
+    externals: {
+        knex: 'commonjs knex'
+    },
     //loaders
     module: {
         rules: [

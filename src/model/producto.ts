@@ -1,4 +1,6 @@
-import fs from "fs";
+import { mysql_connect } from "./../DB/mysql_connect";
+//Connect to DB
+const knex = require("knex")(mysql_connect);
 
 export interface Producto {
   id: number;
@@ -11,49 +13,23 @@ export interface Producto {
   stock: boolean;
 }
 
-const PRODUCTOSTORAGE = "productos.txt";
-
 export class ProductoModel {
   constructor() {}
 
-  private createFile = async (productos?: Producto[]) => {
-    await fs.promises.writeFile(
-      PRODUCTOSTORAGE,
-      productos ? JSON.stringify(productos) : "[]"
-    );
-  };
-
-  private getNewId = async (): Promise<number> => {
-    const productos = await this.getProductos();
-    return productos.length;
-  };
-
   getProducto = async (id: number): Promise<Producto | undefined> => {
-    const productos = await this.getProductos();
-
-    return productos.find((producto) => producto.id === id);
+    const producto = await knex.from("productos").select("*").where("id", "=", id).limit(1);
+    return producto.length ? producto[0] : undefined;
   };
 
   getProductos = async (): Promise<Producto[]> => {
-    if (!fs.existsSync(PRODUCTOSTORAGE)) {
-      await this.createFile();
-      return [];
-    }
-
-    const lectura = await fs.promises.readFile(PRODUCTOSTORAGE, "utf-8");
-    const productos = JSON.parse(lectura);
-
-    return productos;
+    return knex.from("productos").select("*");
   };
 
-  deleteProducto = async (id: number) : Promise<Producto | undefined>=>  {
-    const prod = await this.getProducto(id);
-    if (!prod) return;
-    const productos = await this.getProductos();
-    const newProductos = productos.filter((producto) => producto.id !== id);
-    await this.createFile(newProductos);
-    return prod;
-    
+  deleteProducto = async (id: number): Promise<boolean> => {
+    const cantDeletedRows = await knex("productos")
+      .where("id", "=", id)
+      .delete();
+    return Number(cantDeletedRows) > 0 ;
   };
 
   addProducto = async (
@@ -63,10 +39,8 @@ export class ProductoModel {
     foto: string,
     precio: number,
     stock: boolean
-  ): Promise<Producto> => {
+  ): Promise<Producto | undefined> => {
     const newProducto = {
-      id: await this.getNewId(),
-      timestampt: Date.now(),
       nombre,
       descripcion,
       codigo,
@@ -75,10 +49,8 @@ export class ProductoModel {
       stock,
     };
 
-    const productos = await this.getProductos();
-    productos.push(newProducto);
-    this.createFile(productos);
-    return newProducto;
+    const newId = await knex("productos").insert(newProducto);
+    return this.getProducto(newId);
   };
 
   updateProducto = async (
@@ -90,12 +62,7 @@ export class ProductoModel {
     precio: number,
     stock: boolean
   ): Promise<Producto | undefined> => {
-    const producto = await this.getProducto(id);
-    if (!producto) return;
-
     let newProducto = {
-      id,
-      timestampt: Date.now(),
       nombre,
       descripcion,
       codigo,
@@ -104,11 +71,11 @@ export class ProductoModel {
       stock,
     };
 
-    newProducto = Object.assign(producto,newProducto);
-    let productos = await this.getProductos();
-    productos[productos.findIndex( prod => prod.id === id)] =newProducto;
-    await this.createFile(productos);
+    const updatedProducts = await knex("productos")
+      .where("id", "=", id)
+      .update(newProducto);
+    if (!updatedProducts) return;
 
-    return newProducto;
+    return this.getProducto(id);
   };
 }

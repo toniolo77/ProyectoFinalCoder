@@ -33,15 +33,15 @@ export const addProductoCarrito = async (req: Request, res: Response) => {
     const id_producto = req.body?.id_producto !==undefined
       ? Number(req.body?.id_producto)
       : -1;
-    if (id_carrito === -1) id_carrito = (await carrito.createCarrito()).id;
+    if (id_carrito === -1) id_carrito = (await carrito.createCarrito());
     if (id_producto < 0)
       res
         .status(400)
         .send(
           JSON.stringify({ error: -3, descripcion: "Parametros incorrectos" })
         );
-
-    const newCarrito = await carrito.addProducto(id_carrito, id_producto);
+        
+    const newCarrito = await carrito.addProducto(Number(id_carrito), id_producto);
     newCarrito
       ? res.json(newCarrito)
       : res.status(400).send(
@@ -71,7 +71,7 @@ export const deleteProducto = async (req: Request, res: Response) => {
       Number(id_producto)
     );
     deletedProdCarrito
-      ? res.json(deletedProdCarrito)
+      ? res.json({msg: 'El producto ha sido eliminado exitosamente'})
       : res.status(400).send(
           JSON.stringify({
             error: -3,

@@ -25,7 +25,7 @@ export const deleteProducto = async (req: Request, res: Response) => {
     const deletedProducto = await prod.deleteProducto(Number(id));
 
     return deletedProducto
-      ? res.json(deleteProducto)
+      ? res.json({msg: 'El producto ha sido eliminado exitosamente'})
       : res
           .status(400)
           .send(
