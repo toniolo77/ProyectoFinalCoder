@@ -1,1 +1,0 @@
-[{"id":0,"timestampt":1615233875858,"productos":[{"id":0,"timestampt":1615233895822,"nombre":"revez","descripcion":102,"codigo":"foto2","foto":"imagen","precio":230000,"stock":true}]}]
