@@ -1,23 +1,18 @@
 import { Request, Response } from "express";
 import { ProductoModel } from "../model/producto";
 
-export const getProducto = async (req: Request, res: Response) => {
+export const getProducto = async (req: Request, res: Response, next) => {
   try {
     const { id } = req.params;
     return id
       ? res.json(await ProductoModel.findById(id))
       : res.json(await ProductoModel.find());
-  } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: -3,
-        descripcion: "Se produjo un error al intentar realizar la operacion",
-      });
-  }
+    } catch (err) {
+      next(err)
+    }
 };
 
-export const deleteProducto = async (req: Request, res: Response) => {
+export const deleteProducto = async (req: Request, res: Response, next) => {
   try {
     const { id } = req.params;
     if (!id)
@@ -28,16 +23,11 @@ export const deleteProducto = async (req: Request, res: Response) => {
     const deletedProducto = await ProductoModel.findByIdAndRemove(id);
     res.json(deletedProducto);
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: -3,
-        descripcion: "Se produjo un error al intentar realizar la operacion",
-      });
+    next(err)
   }
 };
 
-export const addProducto = async (req: Request, res: Response) => {
+export const addProducto = async (req: Request, res: Response, next) => {
   try {
     const { nombre, descripcion, codigo, foto, precio, stock } = req.body;
     if (!nombre || !descripcion || !codigo || !foto || !precio || !stock)
@@ -57,11 +47,11 @@ export const addProducto = async (req: Request, res: Response) => {
     }).save();
     res.json(product);
   } catch (err) {
-    res.status(404).json({ error: err });
+    next(err)
   }
 };
 
-export const updateProducto = async (req: Request, res: Response) => {
+export const updateProducto = async (req: Request, res: Response, next) => {
   try {
     const { id } = req.params;
     const { nombre, descripcion, codigo, foto, precio, stock } = req.body;
@@ -85,12 +75,6 @@ export const updateProducto = async (req: Request, res: Response) => {
 
     res.json(product);
   } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .json({
-        error: -3,
-        descripcion: "Se produjo un error al intentar realizar la operacion",
-      });
+    next(err)
   }
 };

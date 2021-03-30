@@ -1,3 +1,4 @@
+import { errorHandler } from './middlewares/error';
 import express, { Application } from "express";
 import mongoose from "mongoose";
 import http from "http";
@@ -37,3 +38,5 @@ app.use((req, res, next) => {
     descripcion: `ruta ${req.originalUrl} no implementada`,
   });
 });
+
+app.use(errorHandler);
