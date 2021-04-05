@@ -1,3 +1,4 @@
+import { EMPTY_VALUE } from "./common";
 import { Response } from "express";
 
 export enum ResponseType {
@@ -20,4 +21,13 @@ export const sendResponse = (
   const status =
     type === ResponseType.OK ? ResponseStatus.VALID : ResponseStatus.ERROR;
   res.status(type).json({ status, value, msg });
+};
+
+export const sendErrorResponse = (
+  res: Response,
+  type: ResponseType,
+  msg: string
+) => {
+  const status = ResponseStatus.ERROR;
+  res.status(type).json({ status, value: EMPTY_VALUE, msg });
 };

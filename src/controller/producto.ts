@@ -1,4 +1,5 @@
-import { EMPTY_VALUE } from "./../utils/common";
+import { ResponseType, sendErrorResponse } from './../utils/responses';
+import { EMPTY_VALUE, getErrorMsg } from "./../utils/common";
 import { Request, Response } from "express";
 import { ProductoModel } from "../model/producto";
 const { validationResult } = require('express-validator');
@@ -19,9 +20,9 @@ export const getProducto = async (req: Request, res: Response, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {     
-      return res.status(422).json({ errors: errors.array() });   
+      return sendErrorResponse(res,ResponseType.BAD_REQUEST,getErrorMsg(errors));
     }
-    
+
     const { id } = req.params;
     return id
       ? res.json((await ProductoModel.findById(id)) ?? EMPTY_VALUE)
@@ -33,12 +34,12 @@ export const getProducto = async (req: Request, res: Response, next) => {
 
 export const deleteProducto = async (req: Request, res: Response, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {     
+      return sendErrorResponse(res,ResponseType.BAD_REQUEST,getErrorMsg(errors));
+    }
+    
     const { id } = req.params;
-    if (!id)
-      res
-        .status(400)
-        .json({ error: -3, descripcion: "Parametros incorrectos" });
-
     const deletedProducto = await ProductoModel.findByIdAndRemove(id);
     res.json(deletedProducto);
   } catch (err) {
@@ -48,14 +49,12 @@ export const deleteProducto = async (req: Request, res: Response, next) => {
 
 export const addProducto = async (req: Request, res: Response, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {     
+      return sendErrorResponse(res,ResponseType.BAD_REQUEST,getErrorMsg(errors));
+    }
+    
     const { nombre, descripcion, codigo, foto, precio, stock } = req.body;
-    if (!nombre || !descripcion || !codigo || !foto || !precio || !stock)
-      res
-        .status(400)
-        .send(
-          JSON.stringify({ error: -3, descripcion: "Parametros incorrectos" })
-        );
-
     const product = await new ProductoModel({
       nombre,
       descripcion,
@@ -72,15 +71,13 @@ export const addProducto = async (req: Request, res: Response, next) => {
 
 export const updateProducto = async (req: Request, res: Response, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {     
+      return sendErrorResponse(res,ResponseType.BAD_REQUEST,getErrorMsg(errors));
+    }
+    
     const { id } = req.params;
     const { nombre, descripcion, codigo, foto, precio, stock } = req.body;
-    if (!id || !nombre || !descripcion || !codigo || !foto || !precio || !stock)
-      res
-        .status(400)
-        .send(
-          JSON.stringify({ error: -3, descripcion: "Parametros incorrectos" })
-        );
-
     let product = await ProductoModel.findById(id);
     product = Object.assign(product, {
       nombre,
