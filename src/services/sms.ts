@@ -3,15 +3,24 @@ const authToken = process.env.AUTHTOKEN;
 
 const client = require("twilio")(acountId, authToken);
 
-const sendSms = (nombre, mensaje) => {
+export const sendSms = (toPhone, message) => {
   client.messages
     .create({
-      body: `user:${nombre}, mensaje:${mensaje}`,
+      body: message,
       from: "+16369238406",
-      to: process.env.PHONE,
+      to: toPhone,
     })
     .then((message) => console.log("envio sms"))
     .catch((err) => console.log(err));
 };
 
-module.exports.sendSms = sendSms;
+export const sendWhatsapp = (message) => {
+  client.messages
+    .create({
+      body: message,
+      from: `whatsapp:${process.env.WHATSAPP_PHONE_FROM}`,
+      to: `whatsapp:${process.env.WHATSAPP_PHONE}`,
+    })
+    .then((message) => console.log("envio sms"))
+    .catch((err) => console.log(err));
+};
