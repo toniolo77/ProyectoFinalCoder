@@ -1,8 +1,6 @@
-import { ResponseType, sendErrorResponse } from './../utils/responses';
-import { EMPTY_VALUE, getErrorMsg } from "./../utils/common";
 import { Request, Response } from "express";
 import { ProductoModel } from "../model/producto";
-const { validationResult } = require('express-validator');
+import { EMPTY_VALUE } from "./../utils/common";
 
 const crearFiltros = (params) => {
   const { nombre, precio_desde, precio_hasta } = params;
@@ -18,11 +16,6 @@ const crearFiltros = (params) => {
 
 export const getProducto = async (req: Request, res: Response, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {     
-      return sendErrorResponse(res,ResponseType.BAD_REQUEST,getErrorMsg(errors));
-    }
-
     const { id } = req.params;
     return id
       ? res.json((await ProductoModel.findById(id)) ?? EMPTY_VALUE)
@@ -34,11 +27,6 @@ export const getProducto = async (req: Request, res: Response, next) => {
 
 export const deleteProducto = async (req: Request, res: Response, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {     
-      return sendErrorResponse(res,ResponseType.BAD_REQUEST,getErrorMsg(errors));
-    }
-    
     const { id } = req.params;
     const deletedProducto = await ProductoModel.findByIdAndRemove(id);
     res.json(deletedProducto);
@@ -49,11 +37,6 @@ export const deleteProducto = async (req: Request, res: Response, next) => {
 
 export const addProducto = async (req: Request, res: Response, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {     
-      return sendErrorResponse(res,ResponseType.BAD_REQUEST,getErrorMsg(errors));
-    }
-    
     const { nombre, descripcion, codigo, foto, precio, stock } = req.body;
     const product = await new ProductoModel({
       nombre,
@@ -71,11 +54,6 @@ export const addProducto = async (req: Request, res: Response, next) => {
 
 export const updateProducto = async (req: Request, res: Response, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {     
-      return sendErrorResponse(res,ResponseType.BAD_REQUEST,getErrorMsg(errors));
-    }
-    
     const { id } = req.params;
     const { nombre, descripcion, codigo, foto, precio, stock } = req.body;
     let product = await ProductoModel.findById(id);

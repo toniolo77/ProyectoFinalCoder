@@ -7,11 +7,13 @@ import {
   deleteProducto,
   updateProducto,
 } from "../controller/producto";
+import fieldsValidation from "../middlewares/field-validation";
 const { param, query, body } = require("express-validator");
 
 router.get(
   "/:id?",
   [
+    middlewares.isLogin,
     param("id")
       .optional()
       .isMongoId()
@@ -25,6 +27,7 @@ router.get(
       .optional()
       .isNumeric()
       .withMessage("debe ser un numero"),
+    fieldsValidation,
   ],
   getProducto
 );
@@ -32,12 +35,14 @@ router.get(
 router.post(
   "/",
   [
+    middlewares.isLogin,
     middlewares.isAdmin,
     body("nombre").isString(),
     body("descripcion").isString(),
     body("codigo").isString(),
     body("foto").isString(),
     body("stock").isNumeric().withMessage("debe ser un numero"),
+    fieldsValidation,
   ],
   addProducto
 );
@@ -45,15 +50,15 @@ router.post(
 router.put(
   "/:id",
   [
+    middlewares.isLogin,
     middlewares.isAdmin,
-    param("id")
-      .isMongoId()
-      .withMessage("tiene que ser un Object ID valido"),
+    param("id").isMongoId().withMessage("tiene que ser un Object ID valido"),
     body("nombre").isString(),
     body("descripcion").isString(),
     body("codigo").isString(),
     body("foto").isString(),
     body("stock").isNumeric().withMessage("debe ser un numero"),
+    fieldsValidation,
   ],
   updateProducto
 );
@@ -61,10 +66,10 @@ router.put(
 router.delete(
   "/:id",
   [
+    middlewares.isLogin,
     middlewares.isAdmin,
-    param("id")
-      .isMongoId()
-      .withMessage("tiene que ser un Object ID valido"),
+    param("id").isMongoId().withMessage("tiene que ser un Object ID valido"),
+    fieldsValidation,
   ],
   deleteProducto
 );

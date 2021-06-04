@@ -12,15 +12,10 @@ export enum ResponseStatus {
   ERROR = 2,
 }
 
-export const sendResponse = (
-  res: Response,
-  type: ResponseType,
-  value: any,
-  msg: string
-) => {
-  const status =
-    type === ResponseType.OK ? ResponseStatus.VALID : ResponseStatus.ERROR;
-  res.status(type).json({ status, value, msg });
+export const sendResponse = (res: Response, value: any, msg: string) => {
+  res
+    .status(ResponseType.OK)
+    .json({ status: ResponseStatus.VALID, value, msg });
 };
 
 export const sendErrorResponse = (
