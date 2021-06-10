@@ -4,8 +4,8 @@
   "description": "",
   "main": "dist/main.js",
   "scripts": {
-    "build": "webpack -w",
-    "start": "nodemon .",
+    "build": "webpack",
+    "start": "node dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --exec ts-node src/index.ts"
   },
