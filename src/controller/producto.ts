@@ -1,3 +1,4 @@
+import { ResponseStatus } from "./../utils/responses";
 import { Request, Response } from "express";
 import { ProductoModel } from "../model/producto";
 import { EMPTY_VALUE } from "./../utils/common";
@@ -25,6 +26,34 @@ export const getProducto = async (req: Request, res: Response, next) => {
   }
 };
 
+export const getOneProduct = async (args) => {
+  try {
+    if (!args.id) {
+      return { err: ResponseStatus.ERROR, msg: "Falta atributo id", value: "" };
+    }
+
+    return await ProductoModel.findById(args.id);
+  } catch (err) {
+    return {
+      err: ResponseStatus.ERROR,
+      msg: "Se produjo un error interno",
+      value: "",
+    };
+  }
+};
+
+export const getProducts = async (args) => {
+  try {
+    return await ProductoModel.find(args);
+  } catch (err) {
+    return {
+      err: ResponseStatus.ERROR,
+      msg: "Se produjo un error interno",
+      value: "",
+    };
+  }
+};
+
 export const deleteProducto = async (req: Request, res: Response, next) => {
   try {
     const { id } = req.params;
@@ -37,7 +66,16 @@ export const deleteProducto = async (req: Request, res: Response, next) => {
 
 export const addProducto = async (req: Request, res: Response, next) => {
   try {
-    const { nombre, descripcion, codigo, foto, precio, stock } = req.body;
+    const product = await addOneProduct(req.body);
+    res.json(product);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const addOneProduct = async (args) => {
+  try {
+    const { nombre, descripcion, codigo, foto, precio, stock } = args;
     const product = await new ProductoModel({
       nombre,
       descripcion,
@@ -46,9 +84,13 @@ export const addProducto = async (req: Request, res: Response, next) => {
       precio,
       stock,
     }).save();
-    res.json(product);
+    return product;
   } catch (err) {
-    next(err);
+    return {
+      err: ResponseStatus.ERROR,
+      msg: "Se produjo un error interno",
+      value: "",
+    };
   }
 };
 

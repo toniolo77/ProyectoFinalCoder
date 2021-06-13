@@ -1,10 +1,12 @@
 import express, { Application } from "express";
 import { errorHandler } from "../middlewares/error";
+import { graphqlHTTP } from "express-graphql";
+import { schema, root } from "../graphQL/schema";
 import passport from "passport";
 import session from "express-session";
 import mainRouter from "../routes/index";
 const MongoStore = require("connect-mongo");
-require('../middlewares/auth');
+require("../middlewares/auth");
 
 const app: Application = express();
 
@@ -23,6 +25,14 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    schema: schema,
+    rootValue: root,
+    graphiql: true,
+  })
+);
 app.use("/", mainRouter);
 
 app.use(errorHandler);
